@@ -6,19 +6,45 @@ import Table from "@/components/Table";
 import { transformData } from "@/service/service";
 import { Data } from "@/types";
 
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Pages() {
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  // Table state
   const [data, setData] = useState<Data[]>([]);
   const [copyData, setCopyData] = useState<Data[]>([]);
-  //Page
-  const postsPerPage = 10;
-  const pagesCount = Math.ceil(copyData.length / postsPerPage);
-  const pages: number[] = Array.from({ length: pagesCount }, (_, i) => i + 1);
+  const [totalPages, setTotalPages] = useState<number[]>([]);
 
+  // Search
+  const [searchName, setSearchName] = useState<string>("");
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const postsPerPage = 10;
   const startIndex = (currentPage - 1) * postsPerPage;
   const endIndex = startIndex + postsPerPage;
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+  const handleNextPage = () => {
+    if (currentPage < totalPages.length) setCurrentPage(currentPage + 1);
+  };
+
+  const pageCreated = (dataLength: number) => {
+    const pagesCount = Math.ceil(dataLength / postsPerPage);
+    let pages: number[] = Array.from({ length: pagesCount }, (_, i) => i + 1);
+    setTotalPages(pages);
+  };
+
+  const handleBtnClick = () => {
+    if (!searchName.trim()) return;
+    const searchData = [
+      ...copyData.filter(
+        (item: Data) => item.title.toLowerCase().indexOf(searchName) != -1
+      ),
+    ];
+    if (searchData.length == 0) return;
+    setData(searchData);
+  };
 
   useEffect(() => {
     (async () => {
@@ -30,6 +56,7 @@ export default function Pages() {
       }
       const result = await response.json();
       setCopyData(result);
+      pageCreated(result.length);
       const paginateData = transformData(result);
       setData(paginateData);
     })();
@@ -40,19 +67,16 @@ export default function Pages() {
     setData(paginateData);
   }, [currentPage]);
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < pages.length) setCurrentPage(currentPage + 1);
-  };
-
   return (
     <>
-      <Search />
+      <Search
+        searchName={searchName}
+        setSearchName={setSearchName}
+        handleBtnClick={handleBtnClick}
+      />
       <Table data={data} />
       <Pagination
-        pages={pages}
+        pages={totalPages}
         startIndex={startIndex}
         endIndex={endIndex}
         items={copyData.length}
@@ -60,7 +84,6 @@ export default function Pages() {
         setCurrentPage={setCurrentPage}
         handleNextPage={handleNextPage}
         handlePreviousPage={handlePreviousPage}
-        
       />
     </>
   );

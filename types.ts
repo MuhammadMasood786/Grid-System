@@ -1,16 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
 
-export interface PaginationProps {
-  items:number
-  currentPage:number
-  startIndex:number
-  endIndex:number
-  pages: number[]
-  setCurrentPage:Dispatch<SetStateAction<number>>
-  handlePreviousPage:()=>void
-  handleNextPage:()=>void
-}
-
 export interface Data {
   userId: number;
   id: number;
@@ -18,7 +7,19 @@ export interface Data {
   body: string;
 }
 
+export interface PaginationProps {
+  items: number;
+  currentPage: number;
+  startIndex: number;
+  endIndex: number;
+  pages: number[];
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  handlePreviousPage: () => void;
+  handleNextPage: () => void;
+}
 
-
-
-
+export interface SearchProp {
+  searchName: string;
+  setSearchName: Dispatch<SetStateAction<string>>;
+  handleBtnClick: () => void;
+}

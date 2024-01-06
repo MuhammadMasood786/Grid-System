@@ -8,6 +8,8 @@ export const transformData = (
   const paginationData:Data[] = data.slice(startIndex, endIndex).map((post: Data) => ({
     ...post,
     body: post.body.length <= 40 ? post.body : post.body.substring(0, 40),
+    title: post.title.length <= 40 ? post.title : post.title.substring(0, 40),
+    
   }));
 
   return  paginationData;
