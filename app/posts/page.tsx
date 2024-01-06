@@ -14,8 +14,11 @@ export default function Pages() {
   const [copyData, setCopyData] = useState<Data[]>([]);
   const [totalPages, setTotalPages] = useState<number[]>([]);
 
-  // Search
+  // Search state
   const [searchName, setSearchName] = useState<string>("");
+
+  //Bookmarks state
+  const [addBookMarks, setBookMarks] = useState<Data[]>([]);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const postsPerPage = 10;
@@ -46,6 +49,24 @@ export default function Pages() {
     setData(searchData);
   };
 
+  const handleBookmarkToggle = (postId: number) => {
+    const updatedBookmarks = [...addBookMarks];
+    const existingIndex = updatedBookmarks.findIndex(
+      (bookmark) => bookmark.id === postId
+    );
+
+    if (existingIndex !== -1) {
+      // Remove bookmark if it already exists
+      updatedBookmarks.splice(existingIndex, 1);
+    } else {
+      // Add bookmark if it doesn't exist
+      const postToAdd = copyData.find((post) => post.id === postId);
+      updatedBookmarks.push(postToAdd);
+    }
+    localStorage.setItem("bookmarks", JSON.stringify(updatedBookmarks));
+    setBookMarks(updatedBookmarks);
+  };
+
   useEffect(() => {
     (async () => {
       const response = await fetch(
@@ -55,17 +76,27 @@ export default function Pages() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
+      const storedBookmarks = localStorage != undefined && JSON.parse(localStorage.getItem("bookmarks")) as Data[] ;
+      setBookMarks(storedBookmarks)
       setCopyData(result);
       pageCreated(result.length);
-      const paginateData = transformData(result);
+      const paginateData = transformData(result, 1, 10, storedBookmarks);
       setData(paginateData);
     })();
   }, []);
 
   useEffect(() => {
-    const paginateData = transformData(copyData, startIndex, endIndex);
+    const paginateData = transformData(
+      copyData,
+      startIndex,
+      endIndex,
+      addBookMarks
+    );
     setData(paginateData);
-  }, [currentPage]);
+  }, [currentPage, addBookMarks]);
+
+
+  
 
   return (
     <>
@@ -74,7 +105,7 @@ export default function Pages() {
         setSearchName={setSearchName}
         handleBtnClick={handleBtnClick}
       />
-      <Table data={data} />
+      <Table data={data} handleBookmarkToggle={handleBookmarkToggle} />
       <Pagination
         pages={totalPages}
         startIndex={startIndex}

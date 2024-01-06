@@ -1,12 +1,14 @@
 import { SearchProp } from "@/types";
 import React from "react";
 import { BsSearch } from "react-icons/bs";
+import { useRouter } from "next/navigation";
 
 export default function Search({
   searchName,
   setSearchName,
   handleBtnClick,
 }: SearchProp) {
+  const navigate = useRouter()
   return (
     <div className="py-10 px-10">
       <label
@@ -32,6 +34,13 @@ export default function Search({
         >
           <BsSearch />
           <span className="sr-only">Search</span>
+        </button>
+        <button
+          type="submit"
+          onClick={()=> navigate.push('/bookmarks')}
+          className="p-2.5 ms-2 text-sm font-medium text-black bg-white-700 rounded-lg border border-black-700  focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        >
+          All Bookmark
         </button>
       </div>
     </div>

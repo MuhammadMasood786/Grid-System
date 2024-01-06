@@ -5,6 +5,7 @@ export interface Data {
   id: number;
   title: string;
   body: string;
+  isBookmarked?: boolean,
 }
 
 export interface PaginationProps {
